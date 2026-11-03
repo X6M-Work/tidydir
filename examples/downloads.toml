@@ -1,0 +1,53 @@
+# Example: keep a Downloads folder under control.
+# Try it with:  tidydir plan ~/Downloads --config examples/downloads.toml
+
+[settings]
+on_conflict = "rename"
+
+# Screenshots first, so they don't fall into the general Images rule.
+[[rule]]
+name = "Screenshots"
+glob = "screenshot*"
+extensions = ["png", "jpg"]
+destination = "Images/Screenshots/{year}-{month}"
+
+[[rule]]
+name = "Images"
+extensions = ["jpg", "jpeg", "png", "gif", "webp", "heic"]
+destination = "Images/{year}"
+
+# Invoices and receipts with a year in the name.
+[[rule]]
+name = "Invoices"
+regex = "(?i)(invoice|receipt).*\\d{4}"
+extensions = ["pdf"]
+destination = "Documents/Invoices/{year}"
+
+[[rule]]
+name = "Documents"
+extensions = ["pdf", "docx", "xlsx", "pptx", "txt", "md", "csv"]
+destination = "Documents/{ext}"
+
+# Big videos go somewhere you'll remember to clean up.
+[[rule]]
+name = "Large videos"
+extensions = ["mp4", "mkv", "mov"]
+min_size = "500MB"
+destination = "Video/Large"
+
+[[rule]]
+name = "Video"
+extensions = ["mp4", "mkv", "mov", "webm"]
+destination = "Video"
+
+# Installers you haven't touched in a month.
+[[rule]]
+name = "Old installers"
+extensions = ["exe", "msi", "dmg", "pkg"]
+older_than = "30d"
+destination = "Installers/Old"
+
+[[rule]]
+name = "Archives"
+extensions = ["zip", "rar", "7z", "gz"]
+destination = "Archives"
