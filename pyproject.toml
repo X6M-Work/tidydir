@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tidydir"
+dynamic = ["version"]
+description = "Sort a messy folder into tidy subfolders using simple rules, with preview and undo."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Syed Ali" }]
+requires-python = ">=3.11"
+keywords = ["files", "organizer", "downloads", "cli", "declutter"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+tidydir = "tidydir.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/zeexduaa/tidydir"
+Issues = "https://github.com/zeexduaa/tidydir/issues"
+
+[tool.hatch.version]
+path = "src/tidydir/__init__.py"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

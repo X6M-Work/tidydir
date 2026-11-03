@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tools
+.pytest_cache/
+pytest-cache-files-*/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets (never commit these)
+.env
+.env.*
+!.env.example
+
+# tidydir's own undo journal, if you test it inside the repo
+.tidydir/
