@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to this project are documented here.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
+
+## [0.1.0] - 2026-11-03
+
+### Added
+
+- `init`, `plan`, `run`, `undo` and `history` commands.
+- TOML rules matching by extension, glob, regex, size and age.
+- Destination placeholders `{ext}`, `{year}`, `{month}`, `{day}`, `{rule}`.
+- Built-in default rules when no `tidydir.toml` is present.
+- Name-clash handling (`rename` or `skip`); files are never overwritten.
+- Undo journal in `.tidydir/history.jsonl`, including partial runs.
