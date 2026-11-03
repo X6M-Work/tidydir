@@ -119,10 +119,19 @@ See [`examples/downloads.toml`](examples/downloads.toml) for a fuller example.
 - Every run is recorded in `.tidydir/history.jsonl`; `tidydir undo` reverses the latest run and
   refuses to overwrite anything that has appeared since.
 
-## Roadmap
+## Where it's going
 
-Planned work (recursive mode, watch mode, duplicate detection, copy/trash actions, PyPI release and
-more) is tracked in [ROADMAP.md](ROADMAP.md) and the [issues](https://github.com/zeexduaa/tidydir/issues).
+tidydir is at v0.1: a safe, rule-based sorter you run by hand. The goal is an organizer you can
+**leave running and trust**:
+
+- **Hands-off:** `tidydir watch` sorts new files as they finish downloading, and can run as a background service on Windows, macOS and Linux.
+- **Smarter rules:** any/all/not logic, rename templates, content-aware matching (real file type, photo EXIF dates) and `tidydir explain` to show why a file went where it did.
+- **More actions:** copy, link, send to the system recycle bin (never hard-delete) and fast duplicate detection.
+- **Crash-safe:** transactional runs that can recover after a crash, and undo for any past run.
+- **Interactive review:** a terminal UI to check and adjust the plan before anything moves.
+
+The full plan, milestone by milestone, is in [ROADMAP.md](ROADMAP.md) and tracked in the
+[issues](https://github.com/zeexduaa/tidydir/issues).
 
 ## Contributing
 
