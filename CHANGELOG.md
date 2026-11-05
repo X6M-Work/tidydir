@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `exclude` patterns, under `[settings]` (applies to every rule) and per rule.
+- Built-in rules now skip unfinished downloads (`*.part`, `*.crdownload`, `*.download`), `*.tmp` and Office lock files (`~$*`).
+
 ## [0.1.0] - 2026-11-03
 
 ### Added

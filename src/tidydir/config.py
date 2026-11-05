@@ -6,7 +6,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .rules import Rule, RuleError
+from .rules import Rule, RuleError, parse_globs
 
 CONFIG_FILENAME = "tidydir.toml"
 CONFLICT_POLICIES = ("rename", "skip")
@@ -19,11 +19,14 @@ DEFAULT_CONFIG = """\
 # Conditions (all optional, every one given must match):
 #   extensions = ["jpg", "png"]   glob = "invoice*"   regex = "\\\\d{4}"
 #   min_size = "10MB"   max_size = "1GB"   older_than = "30d"   newer_than = "12h"
+#   exclude = ["*.tmp"]   (skip these names for this rule only)
 # Destination placeholders: {ext} {year} {month} {day} {rule}
 
 [settings]
 include_hidden = false   # also sort files whose name starts with "."
 on_conflict = "rename"   # "rename" -> "photo (1).jpg", or "skip"
+# Never move these, whatever the rules say (unfinished downloads, temp files):
+exclude = ["*.part", "*.crdownload", "*.download", "*.tmp", "~$*"]
 
 [[rule]]
 name = "Images"
@@ -65,6 +68,7 @@ class ConfigError(ValueError):
 class Settings:
     include_hidden: bool = False
     on_conflict: str = "rename"
+    exclude: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -88,7 +92,7 @@ def parse_config(text: str, source: Path | None = None) -> Config:
     raw_settings = data.get("settings", {})
     if not isinstance(raw_settings, dict):
         raise ConfigError(f"{where}: [settings] must be a table")
-    unknown = set(raw_settings) - {"include_hidden", "on_conflict"}
+    unknown = set(raw_settings) - {"include_hidden", "on_conflict", "exclude"}
     if unknown:
         raise ConfigError(f"{where}: unknown setting(s) {', '.join(sorted(unknown))}")
     include_hidden = raw_settings.get("include_hidden", False)
@@ -97,6 +101,11 @@ def parse_config(text: str, source: Path | None = None) -> Config:
     on_conflict = raw_settings.get("on_conflict", "rename")
     if on_conflict not in CONFLICT_POLICIES:
         raise ConfigError(f"{where}: on_conflict must be one of {', '.join(CONFLICT_POLICIES)}")
+
+    try:
+        exclude = parse_globs(raw_settings["exclude"]) if "exclude" in raw_settings else ()
+    except RuleError as exc:
+        raise ConfigError(f"{where}: [settings] {exc}") from exc
 
     raw_rules = data.get("rule", [])
     if not isinstance(raw_rules, list):
@@ -108,7 +117,7 @@ def parse_config(text: str, source: Path | None = None) -> Config:
     except RuleError as exc:
         raise ConfigError(f"{where}: {exc}") from exc
 
-    return Config(rules, Settings(include_hidden, on_conflict), source)
+    return Config(rules, Settings(include_hidden, on_conflict, exclude), source)
 
 
 def load_config(path: Path) -> Config:
