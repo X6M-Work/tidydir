@@ -15,7 +15,7 @@ Order may change based on feedback; each item has a matching GitHub issue.
 ## v0.2: a richer rule engine
 
 - [ ] **Boolean logic in rules**: `any`/`all`/`not` groups instead of "every condition must match" (M)
-- [ ] **Exclusions**: `exclude = ["*.part", "*.crdownload", "*.tmp"]` globally and per rule (S)
+- [x] **Exclusions**: `exclude = ["*.part", "*.crdownload", "*.tmp"]` globally and per rule (S)
 - [ ] **Rename templates**: `rename = "{year}-{month}-{day} {stem}{suffix}"` with slug/lowercase filters (M)
 - [ ] **`tidydir check` and `tidydir explain FILE`**: validate a config, and show which rule a file hits and why the others didn't (M)
 - [ ] **Error messages with line numbers** pointing into `tidydir.toml` (M)

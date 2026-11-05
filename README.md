@@ -80,6 +80,7 @@ first match wins**. Files that match no rule are left alone.
 [settings]
 include_hidden = false   # also sort files starting with "."
 on_conflict = "rename"   # "rename" -> "photo (1).jpg", or "skip"
+exclude = ["*.part", "*.crdownload", "*.tmp"]   # never move these
 
 [[rule]]
 name = "Screenshots"
@@ -103,6 +104,9 @@ destination = "Installers/Old"
 | `regex` | `"\\d{4}"` | Python regular expression searched in the name |
 | `min_size` / `max_size` | `"500MB"` | Size limits (B, KB, MB, GB, TB) |
 | `older_than` / `newer_than` | `"30d"` | Age by modification time (s, m, h, d, w) |
+| `exclude` | `["*.tmp"]` | Skip this rule for names matching these globs |
+
+`exclude` also works under `[settings]`, where it keeps matching files out of every rule. The built-in rules already skip unfinished downloads (`*.part`, `*.crdownload`, `*.download`), `*.tmp` files and Office lock files (`~$*`).
 
 **Destination placeholders:** `{ext}`, `{year}`, `{month}`, `{day}` (from the file's modification
 time) and `{rule}` (the rule's name). Destinations must stay inside the folder being sorted:
