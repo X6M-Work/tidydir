@@ -25,6 +25,7 @@ _RULE_KEYS = frozenset(
         "max_size",
         "older_than",
         "newer_than",
+        "exclude",
     }
 )
 
@@ -65,6 +66,21 @@ def file_extension(filename: str) -> str:
     return PurePosixPath(filename).suffix.lower().lstrip(".")
 
 
+def parse_globs(value: Any, what: str = "exclude") -> tuple[str, ...]:
+    """Turn ``"*.tmp"`` or ``["*.part", "*.tmp"]`` into a tuple of glob patterns."""
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
+        raise RuleError(f"{what} must be a pattern or a list of patterns, like [\"*.part\", \"*.tmp\"]")
+    return tuple(v.strip() for v in value)
+
+
+def matches_any(filename: str, patterns: tuple[str, ...]) -> bool:
+    """True when ``filename`` matches one of the shell-style ``patterns`` (case-insensitive)."""
+    name = filename.lower()
+    return any(fnmatch.fnmatchcase(name, p.lower()) for p in patterns)
+
+
 def _check_destination(label: str, destination: str) -> None:
     try:
         fields = {f for _, f, _, _ in string.Formatter().parse(destination) if f is not None}
@@ -96,6 +112,7 @@ class Rule:
     max_size: int | None = None
     older_than: int | None = None
     newer_than: int | None = None
+    exclude: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, data: Any, index: int) -> Rule:
@@ -131,11 +148,14 @@ class Rule:
                 max_size=_optional(parse_size, data.get("max_size")),
                 older_than=_optional(parse_age, data.get("older_than")),
                 newer_than=_optional(parse_age, data.get("newer_than")),
+                exclude=parse_globs(data["exclude"]) if "exclude" in data else (),
             )
         except RuleError as exc:
             raise RuleError(f"{label}: {exc}") from exc
 
     def matches(self, filename: str, size: int, mtime: float, now: float) -> bool:
+        if self.exclude and matches_any(filename, self.exclude):
+            return False
         if self.extensions and file_extension(filename) not in self.extensions:
             return False
         if self.glob and not fnmatch.fnmatchcase(filename.lower(), self.glob.lower()):

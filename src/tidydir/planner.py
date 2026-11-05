@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .config import CONFIG_FILENAME, Config
 from .journal import JOURNAL_DIR
+from .rules import matches_any
 
 
 class PlanError(ValueError):
@@ -29,12 +30,16 @@ class Plan:
     skipped: list[tuple[Path, str]] = field(default_factory=list)
 
 
-def iter_candidates(root: Path, include_hidden: bool) -> Iterator[Path]:
+def iter_candidates(
+    root: Path, include_hidden: bool, exclude: tuple[str, ...] = ()
+) -> Iterator[Path]:
     """Regular files directly inside ``root`` that tidydir may move."""
     for entry in sorted(root.iterdir(), key=lambda p: p.name.lower()):
         if entry.name in (CONFIG_FILENAME, JOURNAL_DIR):
             continue
         if not include_hidden and entry.name.startswith("."):
+            continue
+        if exclude and matches_any(entry.name, exclude):
             continue
         if entry.is_symlink() or not entry.is_file():
             continue
@@ -49,7 +54,7 @@ def build_plan(root: Path, config: Config, now: float | None = None) -> Plan:
     claimed: set[str] = set()
     plan = Plan()
 
-    for path in iter_candidates(root, config.settings.include_hidden):
+    for path in iter_candidates(root, config.settings.include_hidden, config.settings.exclude):
         info = path.stat()
         rule = next(
             (r for r in config.rules if r.matches(path.name, info.st_size, info.st_mtime, now)),
